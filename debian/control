@@ -1,0 +1,24 @@
+Source: adpi-dkms
+Section: kernel
+Priority: optional
+Maintainer: Yuta Kiyonaga <kiyonaga@mechatrax.com>
+Uploaders: Masahiro Honda <honda@mechatrax.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Vcs-Git: https://github.com/mechatrax/adpi-dkms.git
+Vcs-Browser: https://github.com/mechatrax/adpi-dkms
+Homepage: https://mechatrax.com
+
+Package: adpi-dkms
+Architecture: armhf arm64
+Conflicts: linux-headers-armmp, linux-headers-armmp-lpae, linux-headers-arm64, raspberrypi-kernel-headers, raspberrypi-kernel-headers-mtx
+Depends: ${misc:Depends}, dkms, xz-utils, linux-source, linux-headers-rpi-dummy | linux-headers-rpi-v6 [armhf] | linux-headers-rpi-v7 [armhf] | linux-headers-rpi-v7l [armhf] | linux-headers-rpi-v8 [arm64] | linux-headers-rpi-2712 [arm64], adpi-dkms-sys-mods [armhf]
+Description: Patches for Linux kernel module to use ADPi (DKMS)
+ This package contains the patches for adc kernel modules. The iio and adc
+ kernel modules for using ADPi to be built with dkms.
+
+Package: adpi-dkms-sys-mods
+Architecture: armhf
+Depends: ${misc:Depends}, raspi-config (>= 20160506)
+Description: System boot configuration for ADPi
+ This package provides system boot configuration for ADPi

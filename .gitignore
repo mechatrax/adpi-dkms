@@ -1,0 +1,13 @@
+*.c
+debian/adpi-dkms.prerm
+debian/adpi-dkms.postinst
+
+debian/debhelper*
+debian/files
+debian/*.log
+debian/*.substvars
+
+debian/.debhelper/*
+debian/adpi-dkms/*
+debian/adpi-dkms-sys-mods/*
+

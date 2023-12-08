@@ -1,0 +1,5 @@
+adpi-dkms (1.0.0) bookworm; urgency=medium
+
+  * Initial release.
+
+ -- Masahiro Honda <honda@mechatrax.com>  Fri, 08 Dec 2023 18:26:07 +0900

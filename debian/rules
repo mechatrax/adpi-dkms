@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+include /usr/share/dpkg/pkg-info.mk
+
+DKMS_VERSION = $(shell echo ${DEB_VERSION_UPSTREAM} | grep -o -E "[0-9]+(\.[0-9]+)*" | head -n1)
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	sed -e "s/#DKMS_VERSION#/${DKMS_VERSION}/g" debian/adpi-dkms.postinst.in > debian/adpi-dkms.postinst
+	sed -e "s/#DKMS_VERSION#/${DKMS_VERSION}/g" debian/adpi-dkms.prerm.in > debian/adpi-dkms.prerm
+
+override_dh_auto_clean:
+	rm -f debian/adpi-dkms.postinst
+	rm -f debian/adpi-dkms.prerm
+
+override_dh_install:
+	dh_install Makefile dkms.conf pre_build.sh usr/src/adpi-$(DKMS_VERSION)/
+	dh_install patches/*.patch usr/src/adpi-$(DKMS_VERSION)/patches
+
+override_dh_auto_configure override_dh_auto_test override_dh_auto_install:
+# do nothing
+
