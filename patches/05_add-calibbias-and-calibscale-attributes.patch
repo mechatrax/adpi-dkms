@@ -1,0 +1,159 @@
+diff --git a/ad7793.c b/ad7793.c
+index d47f5d69d968..71fbd54e9677 100644
+--- a/ad7793.c
++++ b/ad7793.c
+@@ -427,7 +427,6 @@ static int ad7793_read_raw(struct iio_dev *indio_dev,
+ 			return ret;
+ 
+ 		return IIO_VAL_INT;
+-
+ 	case IIO_CHAN_INFO_SCALE:
+ 		switch (chan->type) {
+ 		case IIO_VOLTAGE:
+@@ -474,8 +473,41 @@ static int ad7793_read_raw(struct iio_dev *indio_dev,
+ 		*val = st->chip_info
+ 			       ->sample_freq_avail[AD7793_MODE_RATE(st->mode)];
+ 		return IIO_VAL_INT;
++	case IIO_CHAN_INFO_CALIBBIAS:
++		ret = iio_device_claim_direct_mode(indio_dev);
++		if (ret < 0)
++			return ret;
++
++		ret = ad7793_set_channel(&st->sd, chan->address);
++		if (ret < 0)
++			break;
++
++		ret = ad_sd_read_reg(&st->sd, AD7793_REG_OFFSET,
++			DIV_ROUND_UP(chan->scan_type.realbits
++			+ chan->scan_type.shift, 8), val);
++		break;
++	case IIO_CHAN_INFO_CALIBSCALE:
++		ret = iio_device_claim_direct_mode(indio_dev);
++		if (ret < 0)
++			return ret;
++
++		ret = ad7793_set_channel(&st->sd, chan->address);
++		if (ret < 0)
++			break;
++
++		ret = ad_sd_read_reg(&st->sd, AD7793_REG_FULLSCALE,
++			DIV_ROUND_UP(chan->scan_type.realbits
++			+ chan->scan_type.shift, 8), val);
++		break;
++	default:
++		return -EINVAL;
+ 	}
+-	return -EINVAL;
++
++	iio_device_release_direct_mode(indio_dev);
++	if (ret)
++		return ret;
++
++	return IIO_VAL_INT;
+ }
+ 
+ static int ad7793_write_raw(struct iio_dev *indio_dev,
+@@ -531,6 +563,32 @@ static int ad7793_write_raw(struct iio_dev *indio_dev,
+ 		ad_sd_write_reg(&st->sd, AD7793_REG_MODE, sizeof(st->mode),
+ 				st->mode);
+ 		break;
++	case IIO_CHAN_INFO_CALIBBIAS:
++		ret = ad7793_set_mode(&st->sd, AD7793_MODE_IDLE);
++		if (ret < 0)
++			break;
++
++		ret = ad7793_set_channel(&st->sd, chan->address);
++		if (ret < 0)
++			break;
++
++		ret = ad_sd_write_reg(&st->sd, AD7793_REG_OFFSET,
++			DIV_ROUND_UP(chan->scan_type.realbits
++			+ chan->scan_type.shift, 8), val);
++		break;
++	case IIO_CHAN_INFO_CALIBSCALE:
++		ret = ad7793_set_mode(&st->sd, AD7793_MODE_IDLE);
++		if (ret < 0)
++			break;
++
++		ret = ad7793_set_channel(&st->sd, chan->address);
++		if (ret < 0)
++			break;
++
++		ret = ad_sd_write_reg(&st->sd, AD7793_REG_FULLSCALE,
++			DIV_ROUND_UP(chan->scan_type.realbits
++			+ chan->scan_type.shift, 8), val);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+@@ -563,8 +621,9 @@ static const struct iio_info ad7797_info = {
+ 	.validate_trigger = ad_sd_validate_trigger,
+ };
+ 
+-#define __AD7793_CHANNEL(_si, _channel1, _channel2, _address, _bits, \
+-	_storagebits, _shift, _extend_name, _type, _mask_type_av, _mask_all) \
++#define __AD7793_CHANNEL(_si, _channel1, _channel2, _address, \
++	_bits, _storagebits, _shift, _extend_name, \
++	_type, _mask_separate, _mask_type_av, _mask_all) \
+ 	{ \
+ 		.type = (_type), \
+ 		.differential = (_channel2 == -1 ? 0 : 1), \
+@@ -573,8 +632,7 @@ static const struct iio_info ad7797_info = {
+ 		.channel2 = (_channel2), \
+ 		.address = (_address), \
+ 		.extend_name = (_extend_name), \
+-		.info_mask_separate = BIT(IIO_CHAN_INFO_RAW) | \
+-			BIT(IIO_CHAN_INFO_OFFSET), \
++		.info_mask_separate = _mask_separate, \
+ 		.info_mask_shared_by_type = BIT(IIO_CHAN_INFO_SCALE), \
+ 		.info_mask_shared_by_type_available = (_mask_type_av), \
+ 		.info_mask_shared_by_all = _mask_all, \
+@@ -592,6 +650,9 @@ static const struct iio_info ad7797_info = {
+ 	_storagebits, _shift) \
+ 	__AD7793_CHANNEL(_si, _channel1, _channel2, _address, _bits, \
+ 		_storagebits, _shift, NULL, IIO_VOLTAGE, \
++		BIT(IIO_CHAN_INFO_RAW) | BIT(IIO_CHAN_INFO_OFFSET) \
++			| BIT(IIO_CHAN_INFO_CALIBBIAS) \
++			| BIT(IIO_CHAN_INFO_CALIBSCALE), \
+ 		BIT(IIO_CHAN_INFO_SCALE), \
+ 		BIT(IIO_CHAN_INFO_SAMP_FREQ))
+ 
+@@ -599,12 +660,14 @@ static const struct iio_info ad7797_info = {
+ 	_storagebits, _shift) \
+ 	__AD7793_CHANNEL(_si, _channel, _channel, _address, _bits, \
+ 		_storagebits, _shift, "shorted", IIO_VOLTAGE, \
++		BIT(IIO_CHAN_INFO_RAW) | BIT(IIO_CHAN_INFO_OFFSET), \
+ 		BIT(IIO_CHAN_INFO_SCALE), \
+ 		BIT(IIO_CHAN_INFO_SAMP_FREQ))
+ 
+ #define AD7793_TEMP_CHANNEL(_si, _address, _bits, _storagebits, _shift) \
+ 	__AD7793_CHANNEL(_si, 0, -1, _address, _bits, \
+ 		_storagebits, _shift, NULL, IIO_TEMP, \
++		BIT(IIO_CHAN_INFO_RAW) | BIT(IIO_CHAN_INFO_OFFSET), \
+ 		0, \
+ 		BIT(IIO_CHAN_INFO_SAMP_FREQ))
+ 
+@@ -612,6 +675,7 @@ static const struct iio_info ad7797_info = {
+ 	_shift) \
+ 	__AD7793_CHANNEL(_si, _channel, -1, _address, _bits, \
+ 		_storagebits, _shift, "supply", IIO_VOLTAGE, \
++		BIT(IIO_CHAN_INFO_RAW) | BIT(IIO_CHAN_INFO_OFFSET), \
+ 		0, \
+ 		BIT(IIO_CHAN_INFO_SAMP_FREQ))
+ 
+@@ -619,6 +683,7 @@ static const struct iio_info ad7797_info = {
+ 	_storagebits, _shift) \
+ 	__AD7793_CHANNEL(_si, _channel1, _channel2, _address, _bits, \
+ 		_storagebits, _shift, NULL, IIO_VOLTAGE, \
++		BIT(IIO_CHAN_INFO_RAW) | BIT(IIO_CHAN_INFO_OFFSET), \
+ 		0, \
+ 		BIT(IIO_CHAN_INFO_SAMP_FREQ))
+ 
+@@ -626,6 +691,7 @@ static const struct iio_info ad7797_info = {
+ 	_storagebits, _shift) \
+ 	__AD7793_CHANNEL(_si, _channel, _channel, _address, _bits, \
+ 		_storagebits, _shift, "shorted", IIO_VOLTAGE, \
++		BIT(IIO_CHAN_INFO_RAW) | BIT(IIO_CHAN_INFO_OFFSET), \
+ 		0, \
+ 		BIT(IIO_CHAN_INFO_SAMP_FREQ))
+ 

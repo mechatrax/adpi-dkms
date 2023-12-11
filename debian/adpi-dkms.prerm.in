@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# prerm script for adpi-dkms
+#
+# see: dh_installdeb(1)
+
+set -e
+
+DKMS_NAME=adpi
+DKMS_VERSION=#DKMS_VERSION#
+
+case "$1" in
+    remove|upgrade|deconfigure)
+        if [ "$(dkms status $DKMS_NAME/$DKMS_VERSION)" ]; then
+            dkms remove $DKMS_NAME/$DKMS_VERSION --all > /dev/null
+        fi
+        rm -f /usr/src/$DKMS_NAME/$DKMS_VERSION/ad_sigma_delta.c
+        rm -f /usr/src/$DKMS_NAME/$DKMS_VERSION/ad7793.c
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

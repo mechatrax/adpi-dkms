@@ -1,0 +1,28 @@
+diff --git a/ad7793.c b/ad7793.c
+index 2177504de43d..d47f5d69d968 100644
+--- a/ad7793.c
++++ b/ad7793.c
+@@ -95,9 +95,9 @@
+ #define AD7793_CH_TEMP		6 /* Temp Sensor */
+ #define AD7793_CH_AVDD_MONITOR	7 /* AVDD Monitor */
+ 
+-#define AD7795_CH_AIN4P_AIN4M	4 /* AIN4(+) - AIN4(-) */
+-#define AD7795_CH_AIN5P_AIN5M	5 /* AIN5(+) - AIN5(-) */
+-#define AD7795_CH_AIN6P_AIN6M	6 /* AIN6(+) - AIN6(-) */
++#define AD7795_CH_AIN4P_AIN4M	3 /* AIN4(+) - AIN4(-) */
++#define AD7795_CH_AIN5P_AIN5M	4 /* AIN5(+) - AIN5(-) */
++#define AD7795_CH_AIN6P_AIN6M	5 /* AIN6(+) - AIN6(-) */
+ #define AD7795_CH_AIN1M_AIN1M	8 /* AIN1(-) - AIN1(-) */
+ 
+ /* ID Register Bit Designations (AD7793_REG_ID) */
+@@ -673,8 +676,8 @@ const struct iio_chan_spec _name##_channels[] = { \
+ static DECLARE_AD7793_CHANNELS(ad7785, 20, 32, 4);
+ static DECLARE_AD7793_CHANNELS(ad7792, 16, 32, 0);
+ static DECLARE_AD7793_CHANNELS(ad7793, 24, 32, 0);
+-static DECLARE_AD7795_CHANNELS(ad7794, 16, 32);
+-static DECLARE_AD7795_CHANNELS(ad7795, 24, 32);
++static DECLARE_AD7795_CHANNELS(ad7794, 24, 32);
++static DECLARE_AD7795_CHANNELS(ad7795, 16, 32);
+ static DECLARE_AD7797_CHANNELS(ad7796, 16, 16);
+ static DECLARE_AD7797_CHANNELS(ad7797, 24, 32);
+ static DECLARE_AD7799_CHANNELS(ad7798, 16, 16);

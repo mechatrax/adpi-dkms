@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# postinst script for adpi-dkms
+#
+# see: dh_installdeb(1)
+
+set -e
+
+DKMS_NAME=adpi
+DKMS_VERSION=#DKMS_VERSION#
+KERNELS=$(ls /lib/modules)
+
+case "$1" in
+    configure)
+        for KERNEL in $KERNELS; do
+            echo "Building kernel module for $KERNEL"
+            if [ -e /lib/modules/$KERNEL/build ]; then
+                dkms install $DKMS_NAME/$DKMS_VERSION -k $KERNEL > /dev/null
+                echo "Done."
+            else
+                echo "Skipped."
+            fi
+        done
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

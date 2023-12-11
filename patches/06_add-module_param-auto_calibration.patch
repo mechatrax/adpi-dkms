@@ -1,0 +1,22 @@
+--- a/ad7793.c
++++ b/ad7793.c
+@@ -141,6 +141,9 @@
+ #define AD7793_FLAG_HAS_GAIN		BIT(4)
+ #define AD7793_FLAG_HAS_BUFFER		BIT(5)
+ 
++static bool auto_calibration = true;
++module_param(auto_calibration, bool, S_IRUGO);
++
+ static struct ad7793_platform_data ad7793_default_pdata = {
+ 	.clock_src = AD7793_CLK_SRC_INT,
+ 	.burnout_current = false,
+@@ -236,6 +239,9 @@ static const struct ad_sd_calib_data ad7
+ 
+ static int ad7793_calibrate_all(struct ad7793_state *st)
+ {
++	if (!auto_calibration)
++		return 0;
++
+ 	return ad_sd_calibrate_all(&st->sd, ad7793_calib_arr,
+ 				   st->chip_info->num_calib_pairs * 2);
+ }
