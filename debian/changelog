@@ -1,3 +1,9 @@
+adpi-dkms (1.1.0) bookworm; urgency=medium
+
+  * Update for kernel 6.12.y
+
+ -- Masahiro Honda <honda@mechatrax.com>  Fri, 25 Apr 2025 07:38:27 +0900
+
 adpi-dkms (1.0.1) bookworm; urgency=medium
 
   * Add patch for Raspberry Pi 5
