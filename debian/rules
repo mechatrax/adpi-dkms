@@ -19,7 +19,7 @@ override_dh_auto_clean:
 
 override_dh_install:
 	dh_install Makefile dkms.conf pre_build.sh usr/src/adpi-$(DKMS_VERSION)/
-	dh_install patches/*.patch usr/src/adpi-$(DKMS_VERSION)/patches
+	dh_install patches/* usr/src/adpi-$(DKMS_VERSION)/patches
 
 override_dh_auto_configure override_dh_auto_test override_dh_auto_install:
 # do nothing

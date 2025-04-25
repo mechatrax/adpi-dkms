@@ -8,14 +8,13 @@ set -e
 
 DKMS_NAME=adpi
 DKMS_VERSION=#DKMS_VERSION#
-KERNEL_SOURCE_VERSION=$(zcat /usr/share/doc/linux-source/changelog.Debian.gz | head -1 | sed 's/.*(.*\([0-9\]\+\.[0-9]\+\.[0-9]\+\).*).*/\1/')
 KERNELS=$(ls /lib/modules)
 
 case "$1" in
     configure)
         for KERNEL in $KERNELS; do
             echo "Building kernel module for $KERNEL"
-            if [ -e /lib/modules/$KERNEL/build ] && echo $KERNEL | grep -q $KERNEL_SOURCE_VERSION; then
+            if [ -e /lib/modules/$KERNEL/build ] && [ -e /usr/src/linux-source-$(echo $KERNEL | grep -o -E "^([0-9]+\.[0-9]+)").tar.xz ]; then
                 dkms install $DKMS_NAME/$DKMS_VERSION -k $KERNEL > /dev/null
                 echo "Done."
             else
