@@ -48,24 +48,3 @@ ADPi Pro に搭載されている ad7794 のドライバモジュールです。
      
   kernel module のデフォルト値は 1 です。  
   設定ファイルの初期値は 0 です。
-
-#  adpi-dkms-sys-mods
-armhf 環境で ADPi を使用する際に必要な設定を行います。
-
-## 提供ファイル
-次のファイルがパッケージに含まれています。
-
-### /usr/share/doc/adpi-dkms/changelog.gz
-パッケージの変更履歴を記録したファイルです。
-
-### /usr/share/doc/adpi-dkms/copyright
-著作権とライセンスを記載したファイルです。
-
-## 設定
-インストール時に次のファイルが変更されます。
-
-### /boot/firmware/config.txt
-次のエントリが追記されます。
-```
-arm_64bit=0
-```

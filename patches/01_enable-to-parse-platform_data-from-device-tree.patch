@@ -29,10 +29,10 @@ index 5f8cb9aaac70..2177504de43d 100644
  struct ad7793_chip_info {
  	unsigned int id;
  	const struct iio_chan_spec *channels;
-@@ -773,17 +786,64 @@ static void ad7793_reg_disable(void *reg)
- {
- 	regulator_disable(reg);
- }
+@@ -773,16 +786,63 @@ static void ad7793_reg_disable(void *reg)
+ 	},
+ };
+ 
 +#ifdef CONFIG_OF
 +static struct ad7793_platform_data *ad7793_parse_dt(struct device *dev)
 +{
@@ -75,7 +75,6 @@ index 5f8cb9aaac70..2177504de43d 100644
 +	return NULL;
 +}
 +#endif
- 
  static int ad7793_probe(struct spi_device *spi)
  {
 -	const struct ad7793_platform_data *pdata = spi->dev.platform_data;
