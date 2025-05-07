@@ -1,3 +1,9 @@
+adpi-dkms (1.1.1) bookworm; urgency=medium
+
+  * Improve compatibility
+
+ -- Masahiro Honda <honda@mechatrax.com>  Fri, 25 Apr 2025 11:48:25 +0900
+
 adpi-dkms (1.1.0) bookworm; urgency=medium
 
   * Update for kernel 6.12.y

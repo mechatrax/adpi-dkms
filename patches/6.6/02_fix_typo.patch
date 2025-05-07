@@ -1,0 +1,13 @@
+diff --git a/ad7793.c b/ad7793.c
+index 2177504de43d..d47f5d69d968 100644
+--- a/ad7793.c
++++ b/ad7793.c
+@@ -37,7 +37,7 @@
+ #define AD7793_REG_IO		5 /* IO Register	     (RO, 8-bit) */
+ #define AD7793_REG_OFFSET	6 /* Offset Register	     (RW, 16-bit
+ 				   * (AD7792)/24-bit (AD7793)) */
+-#define AD7793_REG_FULLSALE	7 /* Full-Scale Register
++#define AD7793_REG_FULLSCALE	7 /* Full-Scale Register
+ 				   * (RW, 16-bit (AD7792)/24-bit (AD7793)) */
+ 
+ /* Communications Register Bit Designations (AD7793_REG_COMM) */
